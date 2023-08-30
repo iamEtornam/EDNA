@@ -67,3 +67,11 @@ const darkColorScheme = ColorScheme(
   outlineVariant: Color(0xFF3F484B),
   scrim: Color(0xFF000000),
 );
+
+
+Color fromHex(String hexString) {
+  final buffer = StringBuffer();
+  if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+  buffer.write(hexString.replaceFirst('#', ''));
+  return Color(int.parse(buffer.toString(), radix: 16));
+}

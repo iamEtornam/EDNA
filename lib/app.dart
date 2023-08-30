@@ -1,7 +1,6 @@
-import 'package:edna_app/color_scheme.dart';
 import 'package:edna_app/router.dart';
+import 'package:edna_app/theme/custom_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
@@ -9,19 +8,13 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'EDNA',
+      title: 'EDNA.ai',
       routeInformationProvider: router.routeInformationProvider,
       routeInformationParser: router.routeInformationParser,
       routerDelegate: router.routerDelegate,
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: lightColorScheme,
-          fontFamily: GoogleFonts.poppins().fontFamily),
-      darkTheme: ThemeData(
-          useMaterial3: true,
-          colorScheme: darkColorScheme,
-          fontFamily: GoogleFonts.poppins().fontFamily),
+      theme:customLightTheme(context),
+      darkTheme: customDarkTheme(context),
       themeMode: ThemeMode.system,
     );
   }
