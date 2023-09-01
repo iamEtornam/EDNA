@@ -25,9 +25,37 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.3
+  flutter_native_splash: ^2.3.2
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/edna_logo.png"
+  remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: "assets/edna_logo.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "assets/edna_logo.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "assets/edna_logo.png"
 
 flutter:
   uses-material-design: true
 
   assets:
     - assets/
+
+
+flutter_native_splash:
+  color: "#006878"
+  fullscreen: false
+  android_gravity: fill
+  ios_content_mode: scaleToFill
+  web_image_mode: cover

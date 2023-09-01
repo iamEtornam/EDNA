@@ -1,3 +1,4 @@
+import 'package:edna_app/resources/resources.dart';
 import 'package:edna_app/router.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -13,24 +14,36 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2)).then((value) => context.goNamed(RoutesName.welcome));
+    Future.delayed(const Duration(seconds: 2))
+        .then((value) => context.goNamed(RoutesName.welcome));
   }
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
-      body: const SafeArea(
+      body: SafeArea(
         child: Column(
-
           children: [
-
-            Spacer(),
+            const Spacer(),
             Center(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(
+                  Images.edna1,
+                  width: 200,
+                  height: 94,
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
+            const Spacer(),
+            const Spacer(),
+            const Center(
               child: Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: EdgeInsets.all(10.0),
                 child: SizedBox(
-                  width: 20,
+                    width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       color: Colors.white,
