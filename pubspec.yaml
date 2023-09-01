@@ -19,7 +19,7 @@ dependencies:
   uuid: ^4.0.0-beta3-1
   path: ^1.8.3
   zoom_tap_animation: ^1.1.0
-  palm_api: ^0.0.2
+  palm_api: ^0.0.3
 
 dev_dependencies:
   flutter_test:

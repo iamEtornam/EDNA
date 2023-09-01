@@ -260,10 +260,10 @@ packages:
     dependency: "direct main"
     description:
       name: palm_api
-      sha256: "154b797a1fe75a51e62a1c140c5c54ffb66270dc46f640b4472b8bbb8e140456"
+      sha256: e0cccb6905f7036978731645f35552900fa3160dc3e7185d3eb6958fcaf9ddab
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.2"
+    version: "0.0.3"
   path:
     dependency: "direct main"
     description:

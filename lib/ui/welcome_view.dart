@@ -25,7 +25,12 @@ class _WelcomeViewState extends State<WelcomeView> {
           SizedBox(
             height: MediaQuery.sizeOf(context).height / 5,
           ),
-          Center(child: Image.asset(Images.ednaLogo,width: 120,height: 120,)),
+          Center(
+              child: Image.asset(
+            Images.ednaLogo,
+            width: 120,
+            height: 120,
+          )),
           const SizedBox(height: 24),
           Center(
               child: Text('Welcome to EDNA.ai',
@@ -37,18 +42,23 @@ class _WelcomeViewState extends State<WelcomeView> {
                   style: GoogleFonts.poppins()
                       .copyWith(fontStyle: FontStyle.italic))),
           const SizedBox(height: 32),
-          const CustomTextField(
+          CustomTextField(
             placeholderText: 'e.g Kofi Mensah',
             autocorrect: false,
             keyboardType: TextInputType.name,
             maxLines: 1,
             textCapitalization: TextCapitalization.words,
             label: 'What is your name?',
+            textController: nameTextEditController,
           ),
           const SizedBox(height: 24),
-          PrimaryButton(onPressed: (){
-            context.goNamed(RoutesName.chat,extra: nameTextEditController.text);
-          },label: 'Continue',)
+          PrimaryButton(
+            onPressed: () {
+              context.goNamed(RoutesName.chat,
+                  extra: nameTextEditController.text);
+            },
+            label: 'Continue',
+          )
         ],
       ),
     );

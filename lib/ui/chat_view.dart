@@ -52,23 +52,21 @@ class _ChatViewState extends State<ChatView> {
     if (message is types.TextMessage) {
       // Generate a message
       final response = await palm.generateText(
-        model: 'text-bison-001',
+        model: PalmModel.chatBison001.name,
         prompt: TextPrompt(text: message.text),
       );
       // Print the candidates
 
-      print(response.candidates);
-      print(response.toMap());
-      // String res = response.candidates[0].output;
-      // final m = types.TextMessage(
-      //   author: _bot!,
-      //   text: res,
-      //   id: const Uuid().v4(),
-      //   status: types.Status.delivered,
-      // );
-      // setState(() {
-      //   _messages.insert(0, m);
-      // });
+      String res = response.candidates[0].output;
+      final m = types.TextMessage(
+        author: _bot!,
+        text: res,
+        id: const Uuid().v4(),
+        status: types.Status.delivered,
+      );
+      setState(() {
+        _messages.insert(0, m);
+      });
     }
   }
 
