@@ -1,6 +1,7 @@
 import 'package:edna_app/ui/about_view.dart';
 import 'package:edna_app/UI/chat_view.dart';
 import 'package:edna_app/UI/splash_view.dart';
+import 'package:edna_app/ui/auth_view.dart';
 import 'package:edna_app/ui/welcome_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ class RoutesName {
   static const String chat = '/chat';
   static const String about = '/about';
   static const String welcome = '/welcome';
+  static const String auth = '/auth';
 }
 
 final GoRouter router =
@@ -31,12 +33,27 @@ final GoRouter router =
         );
       }),
       GoRoute(
+          path: '/auth',
+          name: RoutesName.auth,
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: const AuthView(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                  opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
+                  child: child,
+                );
+              },
+            );
+          }),
+      GoRoute(
           path: '/welcome',
           name: RoutesName.welcome,
           pageBuilder: (BuildContext context, GoRouterState state) {
             return CustomTransitionPage(
               key: state.pageKey,
-              child: const WelcomeView(),
+              child:  WelcomeView(name: state.uri.queryParameters['name']),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return FadeTransition(
                   opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),

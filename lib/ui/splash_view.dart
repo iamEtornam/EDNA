@@ -15,7 +15,7 @@ class _SplashViewState extends State<SplashView> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 2))
-        .then((value) => context.goNamed(RoutesName.welcome));
+        .then((value) => context.goNamed(RoutesName.auth));
   }
 
   @override
