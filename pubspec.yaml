@@ -16,10 +16,10 @@ dependencies:
   intl: ^0.18.1
   path_provider: ^2.1.1
   sqflite: ^2.3.0
-  uuid: ^4.0.0-beta3-1
+  uuid: ^4.0.0
   path: ^1.8.3
   zoom_tap_animation: ^1.1.0
-  palm_api: ^0.0.3
+  google_generative_language_api: ^0.2.1
   google_sign_in: ^6.1.5
 
 dev_dependencies:

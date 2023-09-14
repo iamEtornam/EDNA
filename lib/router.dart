@@ -1,6 +1,6 @@
-import 'package:edna_app/ui/about_view.dart';
 import 'package:edna_app/UI/chat_view.dart';
 import 'package:edna_app/UI/splash_view.dart';
+import 'package:edna_app/ui/about_view.dart';
 import 'package:edna_app/ui/auth_view.dart';
 import 'package:edna_app/ui/welcome_view.dart';
 import 'package:flutter/foundation.dart';
@@ -15,23 +15,27 @@ class RoutesName {
   static const String auth = '/auth';
 }
 
-final GoRouter router =
-    GoRouter(debugLogDiagnostics: kDebugMode, initialLocation: RoutesName.initialRoute, routes: [
-  GoRoute(
-      path: '/',
-      name: RoutesName.initialRoute,
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          key: state.pageKey,
-          child: const SplashView(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(
-              opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
-              child: child,
+final GoRouter router = GoRouter(
+    debugLogDiagnostics: kDebugMode,
+    initialLocation: RoutesName.initialRoute,
+    routes: [
+      GoRoute(
+          path: '/',
+          name: RoutesName.initialRoute,
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: const SplashView(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                  opacity: CurveTween(curve: Curves.easeInOutCirc)
+                      .animate(animation),
+                  child: child,
+                );
+              },
             );
-          },
-        );
-      }),
+          }),
       GoRoute(
           path: '/auth',
           name: RoutesName.auth,
@@ -39,9 +43,11 @@ final GoRouter router =
             return CustomTransitionPage(
               key: state.pageKey,
               child: const AuthView(),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
                 return FadeTransition(
-                  opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
+                  opacity: CurveTween(curve: Curves.easeInOutCirc)
+                      .animate(animation),
                   child: child,
                 );
               },
@@ -53,44 +59,52 @@ final GoRouter router =
           pageBuilder: (BuildContext context, GoRouterState state) {
             return CustomTransitionPage(
               key: state.pageKey,
-              child:  WelcomeView(name: state.uri.queryParameters['name']),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              child: WelcomeView(
+                  name: state.uri.queryParameters['name']),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
                 return FadeTransition(
-                  opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
+                  opacity: CurveTween(curve: Curves.easeInOutCirc)
+                      .animate(animation),
                   child: child,
                 );
               },
             );
           }),
-  GoRoute(
-      path: '/chat',
-      name: RoutesName.chat,
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        final arg = state.extra as String;
-        return CustomTransitionPage(
-          key: state.pageKey,
-          child:  ChatView(name: arg),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(
-              opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
-              child: child,
+      GoRoute(
+          path: '/chat',
+          name: RoutesName.chat,
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            final arg = state.extra as String;
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: ChatView(
+                  name: arg),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                  opacity: CurveTween(curve: Curves.easeInOutCirc)
+                      .animate(animation),
+                  child: child,
+                );
+              },
             );
-          },
-        );
-      }),
-  GoRoute(
-      path: '/about',
-      name: RoutesName.about,
-      pageBuilder: (BuildContext context, GoRouterState state) {
-        return CustomTransitionPage(
-          key: state.pageKey,
-          child: const AboutView(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(
-              opacity: CurveTween(curve: Curves.easeInOutCirc).animate(animation),
-              child: child,
+          }),
+      GoRoute(
+          path: '/about',
+          name: RoutesName.about,
+          pageBuilder: (BuildContext context, GoRouterState state) {
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: const AboutView(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                  opacity: CurveTween(curve: Curves.easeInOutCirc)
+                      .animate(animation),
+                  child: child,
+                );
+              },
             );
-          },
-        );
-      }),
-]);
+          }),
+    ]);

@@ -25,7 +25,6 @@ class _WelcomeViewState extends State<WelcomeView> {
   }
   @override
   Widget build(BuildContext context) {
-    nameTextEditController.text = widget.name ?? '';
     return Scaffold(
       body: ListView(
         padding: const EdgeInsets.all(24),

@@ -3,8 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_generative_language_api/google_generative_language_api.dart'
+    as gmr;
 import 'package:intl/intl.dart';
-import 'package:palm_api/palm_api.dart';
 import 'package:uuid/uuid.dart';
 
 import '../resources/resources.dart';
@@ -20,14 +21,13 @@ class ChatView extends StatefulWidget {
 class _ChatViewState extends State<ChatView> {
   static String botId = '1a998815-db44-46de-b263-87162faa9a26';
   static String userId = '82091008-a484-4a89-ae75-a22bf8d6f3ac';
-  // Instantiate the client
-  final palm = TextService(apiKey: const String.fromEnvironment('API_KEY'));
   final List<types.Message> _messages = [];
   types.User? _user, _bot;
 
   @override
   void initState() {
     super.initState();
+
     _user = types.User(
         id: userId,
         lastSeen: DateTime.now().millisecondsSinceEpoch,
@@ -49,15 +49,26 @@ class _ChatViewState extends State<ChatView> {
     setState(() {
       _messages.insert(0, message);
     });
+
+    final allMessages = _messages.map((e) {
+      final message0 = e as dynamic;
+      return gmr.Message(author: e.author.firstName, content: message0.text);
+    }).toList();
     if (message is types.TextMessage) {
       // Generate a message
-      final response = await palm.generateText(
-        model: PalmModel.chatBison001.name,
-        prompt: TextPrompt(text: message.text),
-      );
-      // Print the candidates
+      final request = gmr.GenerateMessageRequest(
+          prompt:
+              gmr.MessagePrompt(context: message.text, messages: allMessages),);
 
-      String res = response.candidates[0].output;
+      final generatedMessage = await gmr.GenerativeLanguageAPI.generateMessage(
+        modelName: 'models/chat-bison-001',
+        request: request,
+        apiKey: const String.fromEnvironment('API_KEY'),
+      );
+
+      // Print the candidates
+      String res = generatedMessage.messages[0].content;
+
       final m = types.TextMessage(
         author: _bot!,
         text: res,
@@ -121,7 +132,6 @@ class _ChatViewState extends State<ChatView> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: Scaffold(
         appBar: AppBar(
