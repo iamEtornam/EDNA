@@ -30,9 +30,9 @@ class _SplashViewState extends State<SplashView> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.asset(
-                  Images.edna1,
+                  Images.ednaLogo,
                   width: 200,
-                  height: 94,
+                  height: 200,
                   fit: BoxFit.fill,
                 ),
               ),

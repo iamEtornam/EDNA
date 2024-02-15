@@ -29,6 +29,23 @@ class _AuthViewState extends State<AuthView> {
         child: Column(
           children: [
             const Spacer(),
+            ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(
+                  Images.ednaLogo,
+                  width: 120,
+                  height: 120,
+                )),
+            const SizedBox(height: 8),
+            Text(
+              'ENDA.ai',
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  color: Colors.white,
+                  fontSize: 29,
+                  fontWeight: FontWeight.bold),
+            ),
+            const Spacer(),
+            const Spacer(),
             Center(
               child: TextButton(
                   style: TextButton.styleFrom(
@@ -41,10 +58,10 @@ class _AuthViewState extends State<AuthView> {
                   child: _loading
                       ? const Center(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 30, vertical: 8),
-                            child: CircularProgressIndicator.adaptive(),
-                          ))
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 30, vertical: 8),
+                          child: CircularProgressIndicator.adaptive(),
+                        ))
                       : Row(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -79,19 +96,19 @@ class _AuthViewState extends State<AuthView> {
     });
     try {
       final googleSignInAccount = await _googleSignIn.signIn();
-      final googleSignInAuthentication = await googleSignInAccount?.authentication;
-      if(googleSignInAuthentication != null && mounted){
+      final googleSignInAuthentication =
+          await googleSignInAccount?.authentication;
+      if (googleSignInAuthentication != null && mounted) {
         final name = googleSignInAccount?.displayName?.split(' ')[0];
-        context.goNamed(RoutesName.welcome,queryParameters: {'name': name});
+        context.goNamed(RoutesName.welcome, queryParameters: {'name': name});
       }
     } catch (error) {
       debugPrint('$error');
-      if(!mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: const Text('Message copied!'),
         clipBehavior: Clip.none,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         behavior: SnackBarBehavior.floating,
       ));
     } finally {
