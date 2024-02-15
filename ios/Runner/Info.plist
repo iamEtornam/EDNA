@@ -11,7 +11,7 @@
                 <array>
                     <!-- TODO Replace this value: -->
                     <!-- Copied from GoogleService-Info.plist key REVERSED_CLIENT_ID -->
-                    <string>ADD YOUR ID HERE</string>
+                    <string>com.googleusercontent.apps.725624935254-poujfprr4t5ljn3tavjv95nukgapdvhk</string>
                 </array>
             </dict>
         </array>

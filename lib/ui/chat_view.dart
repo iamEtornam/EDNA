@@ -3,8 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_generative_language_api/google_generative_language_api.dart'
-    as gmr;
+import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
@@ -23,6 +22,8 @@ class _ChatViewState extends State<ChatView> {
   static String userId = '82091008-a484-4a89-ae75-a22bf8d6f3ac';
   final List<types.Message> _messages = [];
   types.User? _user, _bot;
+  final generativeModel = GenerativeModel(
+      model: 'gemini-pro', apiKey: const String.fromEnvironment('API_KEY'));
 
   @override
   void initState() {
@@ -50,24 +51,28 @@ class _ChatViewState extends State<ChatView> {
       _messages.insert(0, message);
     });
 
-    final allMessages = _messages.map((e) {
-      final message0 = e as dynamic;
-      return gmr.Message(author: e.author.firstName, content: message0.text);
-    }).toList();
+    // final allMessages = _messages.map((e) {
+    //   final message0 = e as dynamic;
+    //   return gmr.Message(author: e.author.firstName, content: message0.text);
+    // }).toList();
     if (message is types.TextMessage) {
       // Generate a message
-      final request = gmr.GenerateMessageRequest(
-          prompt:
-              gmr.MessagePrompt(context: message.text, messages: allMessages),);
+      // final request = gmr.GenerateMessageRequest(
+      //   prompt: gmr.MessagePrompt(context: message.text, messages: allMessages),
+      // );
 
-      final generatedMessage = await gmr.GenerativeLanguageAPI.generateMessage(
-        modelName: 'models/chat-bison-001',
-        request: request,
-        apiKey: const String.fromEnvironment('API_KEY'),
-      );
+      // final generatedMessage = await gmr.GenerativeLanguageAPI.generateMessage(
+      //   modelName: 'models/chat-bison-001',
+      //   request: request,
+      //   apiKey: ,
+      // );
+
+      final content = <Content>[Content.text(message.text)];
+
+      GenerateContentResponse generatedMessage = await generativeModel.generateContent(content);
 
       // Print the candidates
-      String res = generatedMessage.messages[0].content;
+      String res = generatedMessage.text ?? 'Could not generate message';
 
       final m = types.TextMessage(
         author: _bot!,
@@ -133,75 +138,70 @@ class _ChatViewState extends State<ChatView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'EDNA.ai',
-            style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                fontWeight: FontWeight.bold,
-                fontFamily: GoogleFonts.anekGujarati().fontFamily),
-          ),
+      appBar: AppBar(
+        title: Text(
+          'EDNA.ai',
+          style: Theme.of(context).textTheme.titleLarge!.copyWith(
+              fontWeight: FontWeight.bold,
+              fontFamily: GoogleFonts.anekGujarati().fontFamily),
         ),
-        body: Chat(
-          messages: _messages,
-          onMessageTap: _handleMessageTap,
-          onPreviewDataFetched: _handlePreviewDataFetched,
-          onSendPressed: _handleSendPressed,
-          timeFormat: DateFormat('hh:mm a'),
-          showUserAvatars: true,
-          showUserNames: true,
-          user: _user!,
-          emptyState: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Center(
-                  child: Opacity(
-                      opacity: .5,
-                      child: Image.asset(
-                        Images.ednaLogo,
-                        width: 120,
-                        height: 120,
-                      ))),
-              const SizedBox(height: 10),
-              Text('Start chatting with ENDA.ai',
-                  style: GoogleFonts.poppins().copyWith(
-                      fontStyle: FontStyle.italic, color: Colors.grey.shade500))
-            ],
+      ),
+      body: Chat(
+        messages: _messages,
+        onMessageTap: _handleMessageTap,
+        onPreviewDataFetched: _handlePreviewDataFetched,
+        onSendPressed: _handleSendPressed,
+        timeFormat: DateFormat('hh:mm a'),
+        showUserAvatars: false,
+        showUserNames: true,
+        user: _user!,
+        emptyState: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Center(
+                child: Opacity(
+                    opacity: .5,
+                    child: Image.asset(
+                      Images.ednaLogo,
+                      width: 120,
+                      height: 120,
+                    ))),
+            const SizedBox(height: 10),
+            Text('Start chatting with ENDA.ai',
+                style: GoogleFonts.poppins().copyWith(
+                    fontStyle: FontStyle.italic, color: Colors.grey.shade500))
+          ],
+        ),
+        inputOptions: const InputOptions(
+            sendButtonVisibilityMode: SendButtonVisibilityMode.always),
+        theme: DefaultChatTheme(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          inputBorderRadius: BorderRadius.circular(10),
+          inputTextColor: Theme.of(context).textTheme.bodyLarge!.color!,
+          inputTextDecoration: InputDecoration(
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.tertiary, width: .5)),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.tertiary, width: .5)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.tertiary, width: .5)),
+            contentPadding: const EdgeInsets.all(10),
+            fillColor: Theme.of(context).cardColor,
           ),
-          inputOptions: const InputOptions(
-              sendButtonVisibilityMode: SendButtonVisibilityMode.always),
-          theme: DefaultChatTheme(
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            inputBorderRadius: BorderRadius.circular(10),
-            inputTextColor: Theme.of(context).textTheme.bodyLarge!.color!,
-            inputTextDecoration: InputDecoration(
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.tertiary,
-                      width: .5)),
-              enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.tertiary,
-                      width: .5)),
-              focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.tertiary,
-                      width: .5)),
-              contentPadding: const EdgeInsets.all(10),
-              fillColor: Theme.of(context).cardColor,
-            ),
-            inputTextCursorColor: Theme.of(context).colorScheme.primary,
-            inputBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            attachmentButtonIcon: const Icon(Icons.attach_file),
-            secondaryColor: Theme.of(context).colorScheme.tertiary,
-            receivedMessageBodyTextStyle:
-                GoogleFonts.poppins().copyWith(color: Colors.white),
-            primaryColor: Theme.of(context).colorScheme.primary,
-          ),
+          inputTextCursorColor: Theme.of(context).colorScheme.primary,
+          inputBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          attachmentButtonIcon: const Icon(Icons.attach_file),
+          secondaryColor: Theme.of(context).colorScheme.tertiary,
+          receivedMessageBodyTextStyle:
+              GoogleFonts.poppins().copyWith(color: Colors.white),
+          primaryColor: Theme.of(context).colorScheme.primary,
         ),
       ),
     );
