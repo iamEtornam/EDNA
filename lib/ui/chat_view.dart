@@ -20,15 +20,18 @@ class ChatView extends StatefulWidget {
 class _ChatViewState extends State<ChatView> {
   static String botId = '1a998815-db44-46de-b263-87162faa9a26';
   static String userId = '82091008-a484-4a89-ae75-a22bf8d6f3ac';
-  final List<types.Message> _messages = [];
+   List<types.Message> _messages = [];
   types.User? _user, _bot;
-  final generativeModel = GenerativeModel(
-      model: 'gemini-pro', apiKey: const String.fromEnvironment('API_KEY'));
+  late GenerativeModel generativeModel;
+  late final ChatSession _chat;
 
   @override
   void initState() {
     super.initState();
-
+    generativeModel = GenerativeModel(
+        model: 'gemini-pro', apiKey: const String.fromEnvironment('API_KEY'));
+    _chat = generativeModel.startChat();
+    _loadMessages();
     _user = types.User(
         id: userId,
         lastSeen: DateTime.now().millisecondsSinceEpoch,
@@ -43,6 +46,7 @@ class _ChatViewState extends State<ChatView> {
       id: const Uuid().v4(),
       status: types.Status.delivered,
     );
+
     _messages.add(m);
   }
 
@@ -51,25 +55,11 @@ class _ChatViewState extends State<ChatView> {
       _messages.insert(0, message);
     });
 
-    // final allMessages = _messages.map((e) {
-    //   final message0 = e as dynamic;
-    //   return gmr.Message(author: e.author.firstName, content: message0.text);
-    // }).toList();
     if (message is types.TextMessage) {
-      // Generate a message
-      // final request = gmr.GenerateMessageRequest(
-      //   prompt: gmr.MessagePrompt(context: message.text, messages: allMessages),
-      // );
-
-      // final generatedMessage = await gmr.GenerativeLanguageAPI.generateMessage(
-      //   modelName: 'models/chat-bison-001',
-      //   request: request,
-      //   apiKey: ,
-      // );
-
       final content = <Content>[Content.text(message.text)];
 
-      GenerateContentResponse generatedMessage = await generativeModel.generateContent(content);
+      GenerateContentResponse generatedMessage =
+          await generativeModel.generateContent(content);
 
       // Print the candidates
       String res = generatedMessage.text ?? 'Could not generate message';
@@ -124,16 +114,16 @@ class _ChatViewState extends State<ChatView> {
     _addMessage(textMessage);
   }
 
-  // void _loadMessages() async {
-  //   final response = await rootBundle.loadString('assets/messages.json');
-  //   final messages = (jsonDecode(response) as List)
-  //       .map((e) => types.Message.fromJson(e as Map<String, dynamic>))
-  //       .toList();
+  void _loadMessages() async {
+    final messages = _chat.history
+        .map((Content e) => types.Message.fromJson(e.toJson() as Map<String, dynamic>))
+        .toList();
+   
 
-  //   setState(() {
-  //     _messages = messages;
-  //   });
-  // }
+    setState(() {
+      _messages = messages;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,6 +145,7 @@ class _ChatViewState extends State<ChatView> {
         showUserAvatars: false,
         showUserNames: true,
         user: _user!,
+        onAttachmentPressed: () {},
         emptyState: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,

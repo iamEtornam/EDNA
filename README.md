@@ -10,7 +10,7 @@
 
 </p>
 
-This project uses Google's [PaLM API](https://developers.generativeai.google/tutorials/setup) to create a chat app in [Flutter](https://flutter.dev) 
+This project uses Google's [Gemini API](https://developers.generativeai.google/tutorials/setup) to create a chat app in [Flutter](https://flutter.dev) 
 
 ## Art
 
@@ -50,7 +50,7 @@ C:\path\to\project> flutter pub get
 then run:
 
 ```
-C:\path\to\project> flutter run --dart-define=<YOUR PaLM API KEY HERE>
+C:\path\to\project> flutter run --dart-define=<YOUR Gemini API KEY HERE>
 
 ```
 

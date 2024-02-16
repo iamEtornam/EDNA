@@ -8,9 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../theme/custom_button.dart';
 
 class WelcomeView extends StatefulWidget {
-  const WelcomeView({super.key, this.name});
-
-  final String? name;
+  const WelcomeView({super.key});
 
   @override
   State<WelcomeView> createState() => _WelcomeViewState();
@@ -21,8 +19,8 @@ class _WelcomeViewState extends State<WelcomeView> {
   @override
   void initState() {
     super.initState();
-    nameTextEditController.text = widget.name ?? '';
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

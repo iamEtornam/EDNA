@@ -1,7 +1,6 @@
 import 'package:edna_app/UI/chat_view.dart';
 import 'package:edna_app/UI/splash_view.dart';
 import 'package:edna_app/ui/about_view.dart';
-import 'package:edna_app/ui/auth_view.dart';
 import 'package:edna_app/ui/welcome_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +11,6 @@ class RoutesName {
   static const String chat = '/chat';
   static const String about = '/about';
   static const String welcome = '/welcome';
-  static const String auth = '/auth';
 }
 
 final GoRouter router = GoRouter(
@@ -37,30 +35,12 @@ final GoRouter router = GoRouter(
             );
           }),
       GoRoute(
-          path: '/auth',
-          name: RoutesName.auth,
-          pageBuilder: (BuildContext context, GoRouterState state) {
-            return CustomTransitionPage(
-              key: state.pageKey,
-              child: const AuthView(),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                return FadeTransition(
-                  opacity: CurveTween(curve: Curves.easeInOutCirc)
-                      .animate(animation),
-                  child: child,
-                );
-              },
-            );
-          }),
-      GoRoute(
           path: '/welcome',
           name: RoutesName.welcome,
           pageBuilder: (BuildContext context, GoRouterState state) {
             return CustomTransitionPage(
               key: state.pageKey,
-              child: WelcomeView(
-                  name: state.uri.queryParameters['name']),
+              child: WelcomeView(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                 return FadeTransition(
@@ -78,8 +58,7 @@ final GoRouter router = GoRouter(
             final arg = state.extra as String;
             return CustomTransitionPage(
               key: state.pageKey,
-              child: ChatView(
-                  name: arg),
+              child: ChatView(name: arg),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                 return FadeTransition(
