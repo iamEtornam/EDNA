@@ -8,7 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:mime/mime.dart';
 import 'package:uuid/uuid.dart';
 
 import '../resources/resources.dart';
@@ -29,6 +28,8 @@ class _ChatViewState extends State<ChatView> {
   late GenerativeModel generativeModel;
   late final ChatSession _chat;
   Uint8List? _imageBytes;
+  bool isAttachmentUploading = false;
+  bool loading = false;
 
   @override
   void initState() {
@@ -56,56 +57,62 @@ class _ChatViewState extends State<ChatView> {
   }
 
   void _addMessage(types.Message message) async {
-    setState(() {
-      _messages.insert(0, message);
-    });
-
-    if (message is types.TextMessage) {
-      final content = <Content>[Content.text(message.text)];
-
-      GenerateContentResponse generatedMessage =
-          await generativeModel.generateContent(content);
-
-      // Print the candidates
-      String res = generatedMessage.text ?? 'Could not generate message';
-
-      final m = types.TextMessage(
-        author: _bot!,
-        text: res,
-        id: const Uuid().v4(),
-        status: types.Status.delivered,
-      );
-      setState(() {
-        _messages.insert(0, m);
-      });
-    } else if (message is types.ImageMessage) {
-      if (_imageBytes == null) return;
+    try {
       setState(() {
         _messages.insert(0, message);
+        loading = true;
       });
 
-      final content = <Content>[
-        Content.multi([
-          DataPart(lookupMimeType('test.html') ?? 'application/octet-stream',
-              _imageBytes!),
-          TextPart(message.props[0] as String? ?? '')
-        ])
-      ];
+      if (message is types.TextMessage) {
+        final content = <Content>[Content.text(message.text)];
 
-      GenerateContentResponse generatedMessage =
-          await generativeModel.generateContent(content);
+        GenerateContentResponse generatedMessage =
+            await generativeModel.generateContent(content);
 
-      // Print the candidates
-      String res = generatedMessage.text ?? 'Could not generate message';
+        // Print the candidates
+        String res = generatedMessage.text ?? 'Could not generate message';
 
-      final m = types.TextMessage(
-        author: _bot!,
-        text: res,
-        id: const Uuid().v4(),
-        status: types.Status.delivered,
-      );
+        final m = types.TextMessage(
+          author: _bot!,
+          text: res,
+          id: const Uuid().v4(),
+          status: types.Status.delivered,
+        );
+        setState(() {
+          _messages.insert(0, m);
+        });
+      } else if (message is types.ImageMessage) {
+        if (_imageBytes == null) return;
+        setState(() {
+          _messages.insert(0, message);
+        });
+
+        final content = <Content>[
+          Content.multi([
+            DataPart('image/jpeg', _imageBytes!),
+            TextPart(message.props[0] as String? ?? '')
+          ])
+        ];
+
+        GenerateContentResponse generatedMessage =
+            await generativeModel.generateContent(content);
+
+        // Print the candidates
+        String res = generatedMessage.text ?? 'Could not generate message';
+
+        final m = types.TextMessage(
+          author: _bot!,
+          text: res,
+          id: const Uuid().v4(),
+          status: types.Status.delivered,
+        );
+        setState(() {
+          _messages.insert(0, m);
+        });
+      }
+    } finally {
       setState(() {
-        _messages.insert(0, m);
+        loading = false;
       });
     }
   }
@@ -170,64 +177,76 @@ class _ChatViewState extends State<ChatView> {
               fontFamily: GoogleFonts.anekGujarati().fontFamily),
         ),
       ),
-      body: Chat(
-        messages: _messages,
-        onMessageTap: _handleMessageTap,
-        onPreviewDataFetched: _handlePreviewDataFetched,
-        onSendPressed: _handleSendPressed,
-        timeFormat: DateFormat('hh:mm a'),
-        showUserAvatars: false,
-        showUserNames: true,
-        user: _user!,
-        onAttachmentPressed: () => selectImage(context),
-        emptyState: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Center(
-                child: Opacity(
-                    opacity: .5,
-                    child: Image.asset(
-                      Images.ednaLogo,
-                      width: 120,
-                      height: 120,
-                    ))),
-            const SizedBox(height: 10),
-            Text('Start chatting with ENDA.ai',
-                style: GoogleFonts.poppins().copyWith(
-                    fontStyle: FontStyle.italic, color: Colors.grey.shade500))
-          ],
-        ),
-        inputOptions: const InputOptions(
-            sendButtonVisibilityMode: SendButtonVisibilityMode.always),
-        theme: DefaultChatTheme(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          inputBorderRadius: BorderRadius.circular(10),
-          inputTextColor: Theme.of(context).textTheme.bodyLarge!.color!,
-          inputTextDecoration: InputDecoration(
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.tertiary, width: .5)),
-            enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.tertiary, width: .5)),
-            focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.tertiary, width: .5)),
-            contentPadding: const EdgeInsets.all(10),
-            fillColor: Theme.of(context).cardColor,
+      body: Column(
+        children: [
+          if (loading) const LinearProgressIndicator(),
+          Expanded(
+            child: Chat(
+              messages: _messages,
+              onMessageTap: _handleMessageTap,
+              onPreviewDataFetched: _handlePreviewDataFetched,
+              onSendPressed: _handleSendPressed,
+              timeFormat: DateFormat('hh:mm a'),
+              showUserAvatars: false,
+              showUserNames: true,
+              user: _user!,
+              onAttachmentPressed: () => selectImage(context),
+              isAttachmentUploading: isAttachmentUploading,
+              emptyState: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                      child: Opacity(
+                          opacity: .5,
+                          child: Image.asset(
+                            Images.ednaLogo,
+                            width: 120,
+                            height: 120,
+                          ))),
+                  const SizedBox(height: 10),
+                  Text('Start chatting with ENDA.ai',
+                      style: GoogleFonts.poppins().copyWith(
+                          fontStyle: FontStyle.italic,
+                          color: Colors.grey.shade500))
+                ],
+              ),
+              inputOptions: const InputOptions(
+                  sendButtonVisibilityMode: SendButtonVisibilityMode.always),
+              theme: DefaultChatTheme(
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                inputBorderRadius: BorderRadius.circular(10),
+                inputTextColor: Theme.of(context).textTheme.bodyLarge!.color!,
+                inputTextDecoration: InputDecoration(
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.tertiary,
+                          width: .5)),
+                  enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.tertiary,
+                          width: .5)),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.tertiary,
+                          width: .5)),
+                  contentPadding: const EdgeInsets.all(10),
+                  fillColor: Theme.of(context).cardColor,
+                ),
+                inputTextCursorColor: Theme.of(context).colorScheme.primary,
+                inputBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                attachmentButtonIcon: const Icon(Icons.attach_file),
+                secondaryColor: Theme.of(context).colorScheme.tertiary,
+                receivedMessageBodyTextStyle:
+                    GoogleFonts.poppins().copyWith(color: Colors.white),
+                primaryColor: Theme.of(context).colorScheme.primary,
+              ),
+            ),
           ),
-          inputTextCursorColor: Theme.of(context).colorScheme.primary,
-          inputBackgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          attachmentButtonIcon: const Icon(Icons.attach_file),
-          secondaryColor: Theme.of(context).colorScheme.tertiary,
-          receivedMessageBodyTextStyle:
-              GoogleFonts.poppins().copyWith(color: Colors.white),
-          primaryColor: Theme.of(context).colorScheme.primary,
-        ),
+        ],
       ),
     );
   }
@@ -276,14 +295,24 @@ class _ChatViewState extends State<ChatView> {
         });
 
     if (res == null) return;
-    final xFile = await ImagePicker().pickImage(source: res, imageQuality: 60);
-    if (xFile == null) return;
-    if (!mounted) return;
+    try {
+      setState(() {
+        isAttachmentUploading = true;
+      });
+      final xFile =
+          await ImagePicker().pickImage(source: res, imageQuality: 60);
+      if (xFile == null) return;
+      if (!mounted) return;
 
-    final bytes = await xFile.readAsBytes();
+      final bytes = await xFile.readAsBytes();
 
-    setState(() {
-      _imageBytes = bytes;
-    });
+      setState(() {
+        _imageBytes = bytes;
+      });
+    } finally {
+      setState(() {
+        isAttachmentUploading = false;
+      });
+    }
   }
 }
